@@ -29,3 +29,12 @@ model User {
 
   createdAt DateTime @default(now())
 }
+
+model Otp {
+  id String @id @default(uuid())
+  email String
+  code String
+  expiresAt DateTime
+  revoked Boolean @default(false)
+
+}

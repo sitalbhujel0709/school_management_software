@@ -34,4 +34,13 @@ export class AuthController {
       ...userWithoutTokens
     })
   })
+
+  verifyEmail = asyncHandler(async (req:Request, res:Response) => {
+    const {email,otp} = req.body;
+    await this.authService.verifyEmail(email,otp);
+    res.status(200).json({
+      success:true,
+      message:"Email verified successfully"
+    })
+  })
 }

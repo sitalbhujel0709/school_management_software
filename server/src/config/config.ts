@@ -16,12 +16,21 @@ else if(!process.env.ACCESS_TOKEN_SECRET){
 else if(!process.env.REFRESH_TOKEN_SECRET){
   throw new Error("REFRESH_TOKEN_SECRET is not defined in environment variables");
 }
+else if(!process.env.GOOGLE_APP_EMAIL){
+  throw new Error("GOOGLE_APP_EMAIL is not defined in environment variables");
+}
+else if(!process.env.GOOGLE_APP_PASSWORD){
+  throw new Error("GOOGLE_APP_PASSWORD is not defined in environment variables");
+}
+
 const config = {
   port: process.env.PORT,
   databaseUrl: process.env.DB_URL,
   nodeEnv: process.env.NODE_ENV,
   accessTokenSecret: process.env.ACCESS_TOKEN_SECRET,
-  refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET
+  refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET,
+  googleAppEmail: process.env.GOOGLE_APP_EMAIL,
+  googleAppPassword: process.env.GOOGLE_APP_PASSWORD
 }
 
 export default config;
