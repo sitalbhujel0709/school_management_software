@@ -22,6 +22,15 @@ else if(!process.env.GOOGLE_APP_EMAIL){
 else if(!process.env.GOOGLE_APP_PASSWORD){
   throw new Error("GOOGLE_APP_PASSWORD is not defined in environment variables");
 }
+else if(!process.env.CLOUDINARY_CLOUD_NAME){
+  throw new Error("CLOUDINARY_CLOUD_NAME is not defined in environment variables");
+}
+else if(!process.env.CLOUDINARY_API_KEY){
+  throw new Error("CLOUDINARY_API_KEY is not defined in environment variables");
+}
+else if(!process.env.CLOUDINARY_API_SECRET){
+  throw new Error("CLOUDINARY_API_SECRET is not defined in environment variables");
+}
 
 const config = {
   port: process.env.PORT,
@@ -30,7 +39,10 @@ const config = {
   accessTokenSecret: process.env.ACCESS_TOKEN_SECRET,
   refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET,
   googleAppEmail: process.env.GOOGLE_APP_EMAIL,
-  googleAppPassword: process.env.GOOGLE_APP_PASSWORD
+  googleAppPassword: process.env.GOOGLE_APP_PASSWORD,
+  cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
+  cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
+  cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET
 }
 
 export default config;
