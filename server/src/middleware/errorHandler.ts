@@ -1,5 +1,5 @@
 import type {Request, Response, NextFunction} from "express";
-import config from "../config/config";
+import config from "../config/config.js";
 
 export const errorHandler = (err:any,req:Request, res:Response, next:NextFunction) => {
   console.error(err);

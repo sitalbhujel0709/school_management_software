@@ -10,10 +10,18 @@ else if(!process.env.DB_URL){
 else if(!process.env.NODE_ENV){
   throw new Error("NODE_ENV is not defined in environment variables");
 }
+else if(!process.env.ACCESS_TOKEN_SECRET){
+  throw new Error("ACCESS_TOKEN_SECRET is not defined in environment variables");
+}
+else if(!process.env.REFRESH_TOKEN_SECRET){
+  throw new Error("REFRESH_TOKEN_SECRET is not defined in environment variables");
+}
 const config = {
   port: process.env.PORT,
   databaseUrl: process.env.DB_URL,
-  nodeEnv: process.env.NODE_ENV
+  nodeEnv: process.env.NODE_ENV,
+  accessTokenSecret: process.env.ACCESS_TOKEN_SECRET,
+  refreshTokenSecret: process.env.REFRESH_TOKEN_SECRET
 }
 
 export default config;
