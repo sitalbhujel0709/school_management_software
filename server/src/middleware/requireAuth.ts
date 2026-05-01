@@ -11,7 +11,6 @@ export interface requiredAuthRequest extends Request {
 
 export const requireAuth = (req: requiredAuthRequest, res: Response, next: NextFunction) => {
   const { accessToken, refreshToken} = req.cookies
-  console.log("Access Token:", accessToken);
   if (!accessToken || !refreshToken) {
     return next(new AppError(401, "Unauthorized: No tokens provided"));
   }

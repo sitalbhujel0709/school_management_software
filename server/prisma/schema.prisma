@@ -28,7 +28,20 @@ model User {
   isVerified Boolean @default(false)
   createdAt DateTime @default(now())
 
+  studentProfile StudentProfile?
   sessions Session[]
+}
+
+model StudentProfile {
+  id String @id @default(uuid())
+  userId String @unique
+  DOB DateTime
+  contactNumber String
+  address String
+  grade String
+  section String
+
+  user User @relation(fields:[userId],references:[id])
 }
 
 model Otp {
