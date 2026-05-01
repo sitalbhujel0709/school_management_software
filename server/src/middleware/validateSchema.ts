@@ -7,7 +7,7 @@ export const validateSchema = (schema: ZodType<any,any,any>)=> {
     const result = schema.safeParse(req.body);
     if(!result.success){
       const message = result.error.issues[0]?.message || "Validation Error";
-      return next(new AppError(message,400));
+      return next(new AppError(400,message));
     }
     req.body = result.data;
     next();

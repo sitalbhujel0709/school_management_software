@@ -1,3 +1,4 @@
+import config from "../../config/config.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { AuthService } from "./auth.services.js";
 import type {Request, Response, NextFunction} from "express";
@@ -16,15 +17,17 @@ export class AuthController {
   loginUser = asyncHandler(async (req:Request, res:Response) => {
     const {email,password} = req.body;
     const result = await this.authService.loginUser(email,password);
+    console.log(result);
+    const isProduction = config.nodeEnv === 'production';
     res.cookie("accessToken",result.accessToken,{
       httpOnly:true,
-      secure:true,
+      secure:isProduction,
       sameSite:"lax",
       maxAge:15*60*1000
     });
     res.cookie("refreshToken",result.refreshToken,{
       httpOnly:true,
-      secure:true,
+      secure:isProduction,
       sameSite:"lax",
       maxAge:7*24*60*60*1000
     })
