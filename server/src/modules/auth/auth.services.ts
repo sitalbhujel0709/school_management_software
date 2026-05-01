@@ -1,5 +1,6 @@
 import { prisma } from "../../config/prisma.js";
 import type { User } from "../../generated/prisma/client.js";
+import type { Request } from "express";
 import { sendEmail } from "../../utils/emailService.js";
 import { generateAccessToken } from "../../utils/jwt.js";
 import { createUserSchema, type loginUserResponse } from "./auth.schema.js";
@@ -48,7 +49,7 @@ export class AuthService {
     return userWithoutPassword;
   }
 
-  async loginUser(email: string, password: string): Promise<loginUserResponse> {
+  async loginUser(email: string, password: string, req: Request): Promise<loginUserResponse> {
     const user = await this.prisma.user.findUnique({
       where: {
         email
@@ -57,7 +58,7 @@ export class AuthService {
     if (!user) {
       throw new Error("User not found. please check your email and try again")
     }
-    if(!user.isVerified){
+    if (!user.isVerified) {
       throw new Error("Email not verified. Please verify your email before logging in")
     }
     const isPasswordValid = await bcrypt.compare(password, user.password!);
@@ -67,6 +68,16 @@ export class AuthService {
     const { password: _, ...userWithoutPassword } = user;
     const accessToken = generateAccessToken({ userId: user.id, role: user.role });
     const refreshToken = generateAccessToken({ userId: user.id, role: user.role });
+    const refreshTokenHash = await bcrypt.hash(refreshToken, 10);
+    await this.prisma.session.create({
+      data: {
+        userId: user.id,
+        refreshToken: refreshTokenHash,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        ip: req.ip!,
+        userAgent: req.headers['user-agent'] || 'unknown'
+      }
+    })
 
     return {
       user: userWithoutPassword,
@@ -112,6 +123,56 @@ export class AuthService {
           revoked: true
         }
       })
+    })
+  }
+
+  async logoutUser(userId: string, refreshToken: string): Promise<void> {
+    const session = await this.prisma.session.findFirst({
+      where: {
+        userId,
+        revoked: false
+      }
+    })
+    if (!session) {
+      throw new Error("Session not found")
+    }
+    const isRefreshTokenValid = await bcrypt.compare(refreshToken, session.refreshToken);
+    if (!isRefreshTokenValid) {
+      throw new Error("Invalid refresh token")
+    }
+    await this.prisma.session.update({
+      where: {
+        id: session.id
+      },
+      data: {
+        revoked: true
+      }
+    })
+
+  }
+
+  async logoutAllsessions(userId: string, refreshToken: string): Promise<void> {
+    const session = await this.prisma.session.findFirst({
+      where: {
+        userId,
+        revoked: false
+      }
+    })
+    if (!session) {
+      throw new Error("Session not found")
+    }
+    const isRefreshTokenValid = await bcrypt.compare(refreshToken, session.refreshToken);
+    if (!isRefreshTokenValid) {
+      throw new Error("Invalid refresh token")
+    }
+    await this.prisma.session.updateMany({
+      where: {
+        userId,
+        revoked: false
+      },
+      data: {
+        revoked: true
+      }
     })
   }
 }

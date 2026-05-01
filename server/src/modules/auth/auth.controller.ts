@@ -1,4 +1,5 @@
 import config from "../../config/config.js";
+import type { requiredAuthRequest } from "../../middleware/requireAuth.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { AuthService } from "./auth.services.js";
 import type {Request, Response, NextFunction} from "express";
@@ -16,7 +17,7 @@ export class AuthController {
   });
   loginUser = asyncHandler(async (req:Request, res:Response) => {
     const {email,password} = req.body;
-    const result = await this.authService.loginUser(email,password);
+    const result = await this.authService.loginUser(email,password,req);
     const isProduction = config.nodeEnv === 'production';
     res.cookie("accessToken",result.accessToken,{
       httpOnly:true,
@@ -43,6 +44,36 @@ export class AuthController {
     res.status(200).json({
       success:true,
       message:"Email verified successfully"
+    })
+  })
+
+  logoutUser = asyncHandler(async (req:requiredAuthRequest, res:Response)=>{
+    const userId = req.user?.userId as string;
+    const refreshToken = req.cookies.refreshToken;
+    if(!refreshToken){
+      return res.status(400).json({message:"Refresh token is required"});
+    }
+    await this.authService.logoutUser(userId, refreshToken);
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
+    res.status(200).json({
+      success:true,
+      message:"Logged out successfully"
+    })
+  })
+
+  logoutAllsessions = asyncHandler(async (req:requiredAuthRequest, res:Response)=>{
+    const userId = req.user?.userId as string;
+    const refreshToken = req.cookies.refreshToken;
+    if(!refreshToken){
+      return res.status(400).json({message:"Refresh token is required"});
+    }
+    await this.authService.logoutAllsessions(userId, refreshToken);
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
+    res.status(200).json({
+      success:true,
+      message:"Logged out of all sessions successfully"
     })
   })
 }

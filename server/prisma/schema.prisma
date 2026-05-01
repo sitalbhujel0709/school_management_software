@@ -26,8 +26,9 @@ model User {
   avatarUrl String?
   role Role @default(STUDENT)
   isVerified Boolean @default(false)
-
   createdAt DateTime @default(now())
+
+  sessions Session[]
 }
 
 model Otp {
@@ -37,4 +38,16 @@ model Otp {
   expiresAt DateTime
   revoked Boolean @default(false)
 
+}
+
+model Session {
+  id String @id @default(uuid())
+  userId String
+  refreshToken String
+  expiresAt DateTime
+  ip String
+  userAgent String
+  revoked Boolean @default(false)
+
+  user User @relation(fields:[userId],references:[id])
 }
