@@ -77,6 +77,23 @@ export class UserService {
       throw new AppError(404, "User not found");
     }
 
+   
+    if (user.avatarUrl) {
+      try {
+        const urlWithoutQuery = user.avatarUrl.split('?')[0]!;
+        const publicIdMatch = urlWithoutQuery.match(/\/v\d+\/(.+)$/);
+
+        if (publicIdMatch && publicIdMatch[1]) {
+          const publicId = publicIdMatch[1];
+          console.log('Cloudinary public_id to delete:', publicId);
+          const destroyResult = await cloudinary.uploader.destroy(publicId, { resource_type: 'image' });
+          console.log('Cloudinary destroy result:', destroyResult);
+        }
+      } catch (error) {
+        console.error("Error deleting avatar from Cloudinary:", error);
+      }
+    }
+
     await this.prisma.$transaction(async (tx) => {
       await tx.user.delete({
         where: { id: userId }

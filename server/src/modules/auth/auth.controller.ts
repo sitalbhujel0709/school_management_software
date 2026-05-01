@@ -17,7 +17,6 @@ export class AuthController {
   loginUser = asyncHandler(async (req:Request, res:Response) => {
     const {email,password} = req.body;
     const result = await this.authService.loginUser(email,password);
-    console.log(result);
     const isProduction = config.nodeEnv === 'production';
     res.cookie("accessToken",result.accessToken,{
       httpOnly:true,
