@@ -29,6 +29,7 @@ model User {
   createdAt DateTime @default(now())
 
   studentProfile StudentProfile?
+  teacherProfile TeacherProfile?
   sessions Session[]
 }
 
@@ -40,8 +41,43 @@ model StudentProfile {
   address String
   grade String
   section String
+  courseId String
 
+  course Course @relation(fields:[courseId],references:[id])
   user User @relation(fields:[userId],references:[id])
+}
+
+model TeacherProfile {
+  id String @id @default(uuid())
+  userId String @unique
+  DOB DateTime
+  contactNumber String
+  address String
+  subjectId String
+
+  subject Subject @relation(fields:[subjectId],references: [id])
+  user User @relation(fields:[userId],references:[id])
+}
+
+model Course {
+  id String @id @default(uuid())
+  name String
+  code String @unique
+
+  subjects Subject[]
+  enrolledBy StudentProfile[]
+}
+
+
+
+model Subject {
+  id String @id @default(uuid())
+  name String
+  code String @unique
+  courseId String
+
+  teachers TeacherProfile[]
+  course Course @relation(fields:[courseId],references:[id])
 }
 
 model Otp {

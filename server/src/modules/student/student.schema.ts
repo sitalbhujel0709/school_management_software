@@ -5,7 +5,8 @@ export const createStudentProfileSchema = z.object({
   contactNumber: z.string(),
   address: z.string(),
   grade: z.string(),
-  section: z.string()
+  section: z.string(),
+  courseCode: z.string()
 })
 
 export type CreateStudentProfile = z.infer<typeof createStudentProfileSchema>
