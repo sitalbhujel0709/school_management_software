@@ -14,12 +14,22 @@ export class StudentService {
     if(existingProfile){
       throw new Error("Student profile already exists for this user");
     }
-    const studentData = {
+    const course = await this.prisma.course.findUnique({
+      where:{
+        code: data.courseCode
+      }
+    })
+    if(!course){
+      throw new Error("Course not found with the provided course code");
+    }
+    const {courseCode, ...studentData} = data;
+    const studentInputData = {
       userId,
-      ...data
+      ...studentData,
+      courseId: course.id
     }
     const studentProfile = await this.prisma.studentProfile.create({
-      data:studentData
+      data:studentInputData
     })
     if(!studentProfile){
       throw new Error("Failed to create student profile");
