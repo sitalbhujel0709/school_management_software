@@ -43,8 +43,8 @@ model StudentProfile {
   section String
   courseId String
 
-  course Course @relation(fields:[courseId],references:[id])
-  user User @relation(fields:[userId],references:[id])
+  course Course @relation(fields:[courseId],references:[id],onDelete: Cascade)
+  user User @relation(fields:[userId],references:[id],onDelete: Cascade)
 }
 
 model TeacherProfile {
@@ -64,7 +64,7 @@ model Course {
   name String
   code String @unique
 
-  subjects Subject[]
+  subjects Subject[] 
   enrolledBy StudentProfile[]
 }
 
@@ -77,7 +77,7 @@ model Subject {
   courseId String
 
   teachers TeacherProfile[]
-  course Course @relation(fields:[courseId],references:[id])
+  course Course @relation(fields:[courseId],references:[id],onDelete: Cascade)
 }
 
 model Otp {
