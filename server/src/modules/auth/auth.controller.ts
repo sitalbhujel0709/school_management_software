@@ -23,7 +23,7 @@ export class AuthController {
       httpOnly:true,
       secure:isProduction,
       sameSite:"lax",
-      maxAge:15*60*1000
+      maxAge:24*60*60*1000
     });
     res.cookie("refreshToken",result.refreshToken,{
       httpOnly:true,
