@@ -7,7 +7,7 @@ import { createStudentProfileSchema } from "./student.schema.js";
 const studentRouter:Router = Router();
 const studentController = new StudentController();
 
-studentRouter.post("/:userId/profile",requireAuth, requireRole(["ADMIN"]),validateSchema(createStudentProfileSchema), studentController.createStudentProfile);
+studentRouter.post("/profile",requireAuth, requireRole(["ADMIN"]),validateSchema(createStudentProfileSchema), studentController.createStudentProfile);
 studentRouter.get("/profile",requireAuth, requireRole(["STUDENT"]), studentController.getStudentProfile);
 studentRouter.get("/profile/:id",requireAuth, requireRole(["ADMIN"]), studentController.getStudentProfileById);
 studentRouter.put("/profile/:id",requireAuth, requireRole(["ADMIN"]), studentController.updateStudentProfile);

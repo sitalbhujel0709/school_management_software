@@ -1,56 +1,30 @@
 import {prisma} from "../src/config/prisma.js";
 import { Role } from "../src/generated/prisma/enums.js";
 
-interface UserData {
-	email: string;
-	password: string;
+interface SemesterData {
 	name: string;
-	role: Role;
-	isVerified: boolean;
+	startDate: Date;
+	endDate: Date;
 }
-const userData: UserData[] = [
+const semesterData: SemesterData[] = [
 	{
-		email: "sital@example.com",
-		password: "password123",
-		name:"sital bhujel",
-		role: "ADMIN",
-		isVerified: true,
+		name: "Fall 2023",
+		startDate: new Date("2023-09-01"),
+		endDate: new Date("2023-12-31")
 	},
 	{
-		email: "ning@example.com",
-		password: "password123",
-		name:"ningwa iwahang",
-		role: "STUDENT",
-		isVerified: true,
-	},
-	{
-		email: "teacher@example.com",
-		password: "password123",
-		name:"teacher name",
-		role: "TEACHER",
-		isVerified: true,
-	},
-	{
-		email: "johndoe@example.com",
-		password: "password123",
-		name:"john doe",
-		role: "STUDENT",
-		isVerified: true,
-	},
-	{
-		email: "janesmith@example.com",
-		password: "password123",
-		name:"jane smith",
-		role: "TEACHER",
-		isVerified: true,
+		name: "Spring 2024",
+		startDate: new Date("2024-01-01"),
+		endDate: new Date("2024-05-31")
 	}
 ]
+		
 
 const seed = async ()=> {
 	try{
-		for(const user of userData){
-			await prisma.user.create({
-				data: user,
+		for(const semester of semesterData){
+			await prisma.semester.create({
+				data: semester,
 			})
 		}
 	} catch(error){

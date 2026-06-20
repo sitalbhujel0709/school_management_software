@@ -2,13 +2,13 @@ import jwt from "jsonwebtoken";
 import config from "../config/config.js";
 
 interface JwtPayload{
-  userId: string;
+  userId: number;
   role: "ADMIN" | "TEACHER" | "STUDENT";
 }
 
 export const generateAccessToken = (payload:JwtPayload) => {
   return jwt.sign(payload,config.accessTokenSecret,{
-    expiresIn: "15m"
+    expiresIn: "1d"
   })
 }
 

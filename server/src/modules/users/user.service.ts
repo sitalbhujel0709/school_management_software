@@ -45,14 +45,14 @@ export class UserService {
         },
         isVerified: true
       },
-      select: {
-        id: true,
-        email: true,
-        role: true,
-        name: true,
+
+      include:{
+        student:true,
+        teacher:true
       }
     })
-    return users;
+    const usersWithoutPasswords = users.map(({ password, ...user }) => user);
+    return usersWithoutPasswords;
   }
   async updateUser(userId: string, data: Partial<Omit<User, "id" | "password" | "createdAt" | "updatedAt">>): Promise<Omit<User, "password">> {
     const user = await this.prisma.user.findUnique({

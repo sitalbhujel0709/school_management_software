@@ -7,12 +7,9 @@ export class StudentController {
   private studentService = new StudentService();
 
   createStudentProfile = asyncHandler( async (req: Request, res:Response):Promise<void | Response> => {
-    const userId = req.params.userId;
-    if(!userId){
-      return res.status(400).json({message:"User ID is required"});
-    }
+
     const data = req.body;
-    const studentProfile = await this.studentService.createStudentProfile(userId as string, data);
+    const studentProfile = await this.studentService.createStudentProfile( data);
     res.status(201).json({success:true, studentProfile});
   })
 

@@ -24,102 +24,85 @@ enum AttendanceStatus {
   EXCUSED
 }
 
-model User {
-  id String @id @default(uuid())
-  email String @unique
-  password String?
-  name String
-  role Role
-  isVerified Boolean @default(false)
-  createdAt DateTime @default(now())
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
 
-  student Student?
-  teacher Teacher?
+model User {
+  id Int @id @default(autoincrement())
+  email String @unique
+  passwordHash String
+  name String
+  role Role @default(STUDENT)
+  isVerified Boolean @default(false)
+
+  studentProfile StudentProfile?
+  teacherProfile TeacherProfile?
+
   otps Otp[]
   sessions Session[]
 }
-
-model Student {
-  id String @id @default(uuid())
-  userId String @unique
-
+model StudentProfile {
+  userId Int @unique @id
   user User @relation(fields:[userId],references:[id])
-  courses Enrollment[]
-  attendances attendence[]
+
+  subjects studentSubject[]
 }
-
-model Teacher {
-  id String @id @default(uuid())
-  userId String @unique
-
-  courses course_teacher[]
+model TeacherProfile {
+  userId Int @unique @id
   user User @relation(fields:[userId],references:[id])
-  attendances attendence[]
+
+  subjects Subject[]
 }
-
-model Course {
-  id String @id @default(uuid())
-  name String
-  description String
-  credits Int
-
-  enrollments Enrollment[]
-  teachers course_teacher[]
-  attendances attendence[]
+model Class {
+  id Int @id @default(autoincrement())
+  
+  subjects Subject[]
 }
+model Subject {
+  id Int @id @default(autoincrement())
+  subjectName String
+  subjectCode String @unique
+  creditHours Int
+  classId Int
+  teacherId Int 
 
-model Enrollment {
-  id String @id @default(uuid())
-  studentId String
-  courseId String
+  class Class @relation(fields:[classId],references:[id], onDelete: Cascade)
+  teacher TeacherProfile @relation(fields:[teacherId],references:[userId], onDelete: Cascade)
 
-
-  student Student @relation(fields:[studentId],references:[id])
-  course Course @relation(fields:[courseId],references:[id])
+  students studentSubject[]
 }
+model studentSubject {
+  id Int @id @default(autoincrement())
+  studentId Int
+  subjectId Int
 
-model course_teacher {
-  id String @id @default(uuid())
-  courseId String
-  teacherId String
+  student StudentProfile @relation(fields:[studentId],references:[userId], onDelete: Cascade)
+  subject Subject @relation(fields:[subjectId],references:[id], onDelete: Cascade)
 
-  course Course @relation(fields:[courseId],references:[id])
-  teacher Teacher @relation(fields:[teacherId],references:[id])
+  @@unique([studentId, subjectId])
 }
-
-model attendence {
-  id String @id @default(uuid())
-  date DateTime
-  status AttendanceStatus
-  studentId String
-  courseId String
-  teacherId String
-
-  student Student @relation(fields:[studentId],references:[id])
-  course Course @relation(fields:[courseId],references:[id])
-  teacher Teacher @relation(fields:[teacherId],references:[id])
-}
-
-
 model Otp {
   id String @id @default(uuid())
   email String
   code String
   expiresAt DateTime
   revoked Boolean @default(false)
-  userId String 
+  userId Int
 
-  user User @relation(fields:[userId],references:[id])
+  user User @relation(fields:[userId],references:[id],onDelete: Cascade)
 }
 
 model Session {
   id String @id @default(uuid())
-  userId String
+  userId Int
   refreshToken String
   expiresAt DateTime
   ip String
   userAgent String
   revoked Boolean @default(false)
 
-  user User @relation(fields:[userId],references:[id])
+  user User @relation(fields:[userId],references:[id],onDelete: Cascade)
 }

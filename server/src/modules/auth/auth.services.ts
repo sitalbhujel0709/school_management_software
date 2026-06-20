@@ -10,7 +10,7 @@ import bcrypt from "bcrypt";
 export class AuthService {
   private prisma = prisma;
 
-  async createUser(data: createUserSchema): Promise<Omit<User, "password">> {
+  async createUser(data: createUserSchema): Promise<Omit<User, "passwordHash">> {
 
     const existingUser = await this.prisma.user.findUnique({
       where: {
@@ -27,7 +27,7 @@ export class AuthService {
       data: {
         name: data.name,
         email: data.email,
-        password: hashedPassword,
+        passwordHash: hashedPassword,
         role: data.role
       }
     })
@@ -39,13 +39,14 @@ export class AuthService {
       data: {
         email: data.email,
         code: hashedOTP,
+        userId: user.id,
         expiresAt: new Date(Date.now() + 10 * 60 * 1000) // OTP expires in 5 minutes
       }
     })
 
     await sendEmail(data.email, "Verify your email", "Your OTP code is: " + otp);
 
-    const { password, ...userWithoutPassword } = user;
+    const { passwordHash, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
 
@@ -61,11 +62,11 @@ export class AuthService {
     if (!user.isVerified) {
       throw new Error("Email not verified. Please verify your email before logging in")
     }
-    const isPasswordValid = await bcrypt.compare(password, user.password!);
+    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
     if (!isPasswordValid) {
       throw new Error("Invalid password. please check your password and try again")
     }
-    const { password: _, ...userWithoutPassword } = user;
+    const { passwordHash, ...userWithoutPassword } = user;
     const accessToken = generateAccessToken({ userId: user.id, role: user.role });
     const refreshToken = generateAccessToken({ userId: user.id, role: user.role });
     const refreshTokenHash = await bcrypt.hash(refreshToken, 10);
@@ -126,7 +127,7 @@ export class AuthService {
     })
   }
 
-  async logoutUser(userId: string, refreshToken: string): Promise<void> {
+  async logoutUser(userId: number, refreshToken: string): Promise<void> {
     const session = await this.prisma.session.findFirst({
       where: {
         userId,
@@ -151,7 +152,7 @@ export class AuthService {
 
   }
 
-  async logoutAllsessions(userId: string, refreshToken: string): Promise<void> {
+  async logoutAllsessions(userId: number, refreshToken: string): Promise<void> {
     const session = await this.prisma.session.findFirst({
       where: {
         userId,

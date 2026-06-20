@@ -1,35 +1,31 @@
 import { prisma } from "../../config/prisma.js";
-import type { StudentProfile } from "../../generated/prisma/client.js";
+import type { Student } from "../../generated/prisma/client.js";
 import type { CreateStudentProfile } from "./student.schema.js";
 
 export class StudentService {
   private prisma = prisma;
 
-  async createStudentProfile(userId:string,data:CreateStudentProfile):Promise<StudentProfile>{
-    const existingProfile = await this.prisma.studentProfile.findUnique({
+  async createStudentProfile(data:CreateStudentProfile):Promise<Student>{
+    
+    const semester = await this.prisma.semester.findFirst({
       where:{
-        userId
-      }
-    });
-    if(existingProfile){
-      throw new Error("Student profile already exists for this user");
-    }
-    const course = await this.prisma.course.findUnique({
-      where:{
-        code: data.courseCode
+        name:data.semester
       }
     })
-    if(!course){
-      throw new Error("Course not found with the provided course code");
-    }
-    const {courseCode, ...studentData} = data;
-    const studentInputData = {
-      userId,
-      ...studentData,
-      courseId: course.id
-    }
-    const studentProfile = await this.prisma.studentProfile.create({
-      data:studentInputData
+    const user = await this.prisma.user.findUnique({
+      where:{
+        email:data.email}
+    })
+
+    
+    const studentProfile = await this.prisma.student.create({
+      data:{
+        userId: user?.id || "",
+        dateOfBirth:data.dateOfBirth,
+        gender:data.gender,
+        semesterId:semester?.id || "",
+
+      }
     })
     if(!studentProfile){
       throw new Error("Failed to create student profile");
